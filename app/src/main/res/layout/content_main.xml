@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,39 +9,71 @@
     tools:layout_editor_absoluteY="56dp"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/button"
+    <Chronometer
+        android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
-        tools:layout_editor_absoluteX="29dp"
-        tools:layout_editor_absoluteY="486dp" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="End"
-        tools:layout_editor_absoluteX="253dp"
-        tools:layout_editor_absoluteY="486dp" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="257dp"
-        android:layout_height="wrap_content"
-        android:text="Analyze"
-        tools:layout_editor_absoluteX="53dp"
-        tools:layout_editor_absoluteY="573dp" />
+        android:layout_below="@id/pb"
+        android:layout_centerInParent="true"
+        android:textSize="30sp" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="203dp"
-        android:layout_height="46dp"
-        android:background="@android:color/black"
-        android:max="100"
-        android:visibility="visible"
-        tools:layout_editor_absoluteX="88dp"
-        tools:layout_editor_absoluteY="350dp" />
+        android:id="@+id/pb"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        android:progressDrawable="@drawable/progressbar_states" />
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/tv_percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="#000"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/start_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pb"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="2dp"
+        android:onClick="startTimer"
+        android:text="@string/start" />
+
+    <Button
+        android:id="@+id/stop_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pb"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="-6dp"
+        android:onClick="stopTimer"
+        android:text="@string/end" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/analyze_data"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".30"
+            android:onClick="resetTimerAndSendDataToCloud"
+            android:text="@string/analyze" />
+    </LinearLayout>
+
+</RelativeLayout>
