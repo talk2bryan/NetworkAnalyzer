@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentBattteryPercentage = 0;
     private ProgressBar progressBar;
     private TextView batteryPercentageTextView;
+    private TextView wifiConnectionStatusTextView;
     private Chronometer chronometer;
     private long stopChronometerOffset;
     private boolean chronometerRunning;
@@ -58,14 +59,15 @@ public class MainActivity extends AppCompatActivity {
             chronometer.start();
             chronometerRunning = true;
 
-            Runnable periodicRecording = new Runnable() {
-                @Override
-                public void run() {
-                    if (connectivitySensor.hasInternetConnection(context)) {
-                        connectivitySensor.recordWifiSignalStrength(context);
-                    } else {
-                        Log.d("MainActivity", "startTimer() - Not connected to WiFi");
-                    }
+            Runnable periodicRecording = () -> {
+                if (connectivitySensor.hasInternetConnection(context)) {
+                    wifiConnectionStatusTextView.setText("Connected to Internet");
+                    wifiConnectionStatusTextView.setBackgroundColor(0xFF7CCC26); // Green.
+                    connectivitySensor.recordWifiSignalStrength(context);
+                } else {
+                    wifiConnectionStatusTextView.setText("Not Connected to Internet");
+                    wifiConnectionStatusTextView.setBackgroundColor(0xFFFF0000); // Red.
+                    Log.d("MainActivity", "startTimer() - Not connected to WiFi");
                 }
             };
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             chronometerRunning = false;
             scheduledFuture.cancel(false);
 
-            connectivitySensor.printResults();
+            connectivitySensor.sendDataToCloud();
             Log.d("MainActivity", "stopTimer()");
         }
 
@@ -108,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
         context.registerReceiver(broadcastReceiver, intentFilter);
 
         batteryPercentageTextView = findViewById(R.id.tv_percentage);
+        wifiConnectionStatusTextView = findViewById(R.id.wifiIsConnected);
         progressBar = findViewById(R.id.pb);
-
 
         chronometer = findViewById(R.id.chronometer);
         chronometer.setFormat("Time: %s");
