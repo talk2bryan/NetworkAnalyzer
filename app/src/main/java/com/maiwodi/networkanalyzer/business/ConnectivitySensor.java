@@ -61,9 +61,12 @@ public class ConnectivitySensor {
         dataEntries.add(new DataEntry(timeStamp, rssiValue, speedInMbpsSpeed));
     }
 
+
     public void sendDataToCloud() {
         if (this.dataEntries != null) {
             LOGGER.info(buildJsonString());
+
+            new CallAPI().execute(AWS_SERVER, buildJsonString());
             dataEntries = null;
         }
     }
@@ -76,12 +79,11 @@ public class ConnectivitySensor {
         ObjectWriter ow = objectMapper.writer().withDefaultPrettyPrinter();
         String json = null;
         try {
-            json = ow.writeValueAsString(this);
+            json = ow.writeValueAsString(dataEntries);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-//        LOGGER.info(json);
         return json;
     }
 }
