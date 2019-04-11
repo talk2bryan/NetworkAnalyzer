@@ -2,8 +2,6 @@ package com.maiwodi.networkanalyzer.business;
 
 import android.os.AsyncTask;
 
-import org.json.JSONException;
-
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -17,12 +15,7 @@ public class HTTPNetworkAsyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls) {
         try {
-            try {
-                return httpPost(urls[0], urls[1]);
-            } catch (JSONException jse) {
-                jse.printStackTrace();
-                return "JSON Error";
-            }
+            return httpPost(urls[0], urls[1]);
         } catch (IOException ioe) {
             return "Unable to retrieve web page. Invalid url.";
         }
