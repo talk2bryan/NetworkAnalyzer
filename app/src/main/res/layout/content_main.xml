@@ -76,4 +76,10 @@
             android:text="@string/analyze" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/wifiIsConnected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WiFi Connection" />
+
 </RelativeLayout>
