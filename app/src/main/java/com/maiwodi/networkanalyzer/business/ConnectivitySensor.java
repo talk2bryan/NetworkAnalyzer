@@ -24,7 +24,10 @@ public class ConnectivitySensor {
             Thread.currentThread().getStackTrace()[0].getClassName());
 
     private ArrayList<DataEntry> dataEntries;
-    private static final String AWS_SERVER = "http://ec2-3-94-173-58.compute-1.amazonaws.com:8080/networkanalyzer-1.0-SNAPSHOT/rest/myresource/post/data";
+    private static final  String BASE_ADDRESS = "http://";
+    private static final String DEFAULT_SERVER_IP = "140.193.200.126";
+    private static final String POST_RESOURCE_PATH = ":8080/networkanalyzer/rest/myresource/post/data";
+
 
     public ConnectivitySensor() {
         LOGGER.info("ConnectivitySensor instantiated.");
@@ -62,11 +65,17 @@ public class ConnectivitySensor {
     }
 
 
-    public void sendDataToCloud() {
+    public void sendDataToCloud(String userMasterIP) {
         if (this.dataEntries != null) {
             LOGGER.info(buildJsonString());
 
-            new CallAPI().execute(AWS_SERVER, buildJsonString());
+            String postUrl = String.format(
+              "%s%s%s", BASE_ADDRESS,
+                    (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
+                    POST_RESOURCE_PATH
+            );
+
+            new CallAPI().execute(postUrl, buildJsonString());
             dataEntries = null;
         }
     }

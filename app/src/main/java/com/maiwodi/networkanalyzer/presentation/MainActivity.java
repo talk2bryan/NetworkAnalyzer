@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private long stopChronometerOffset;
     private boolean chronometerRunning;
     private ScheduledFuture<?> scheduledFuture;
+
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -99,7 +102,10 @@ public class MainActivity extends AppCompatActivity {
             chronometerRunning = false;
             scheduledFuture.cancel(false);
 
-            connectivitySensor.sendDataToCloud();
+            EditText masterIP = findViewById(R.id.ipAddress);
+            String masterIPAddress = String.valueOf(masterIP.getText());
+            connectivitySensor.sendDataToCloud(masterIPAddress);
+
             Log.d("MainActivity", "stopTimer()");
         }
 
