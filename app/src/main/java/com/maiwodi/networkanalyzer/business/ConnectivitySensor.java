@@ -50,7 +50,7 @@ public class ConnectivitySensor {
     }
 
     public void recordWifiSignalStrength(final Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int rssiValue = wifiInfo.getRssi(); // Unit is dBm.
         int speedInMbpsSpeed = wifiInfo.getLinkSpeed();
