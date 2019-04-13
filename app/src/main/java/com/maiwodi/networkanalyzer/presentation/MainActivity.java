@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView batteryPercentageTextView;
     private TextView wifiConnectionStatusTextView;
     private Chronometer chronometer;
-    private long stopChronometerOffset;
     private boolean chronometerRunning;
     private ScheduledFuture<?> scheduledFuture;
 
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startTimer(View v) {
         if (!chronometerRunning) {
-            chronometer.setBase(SystemClock.elapsedRealtime() - stopChronometerOffset);
+            chronometer.setBase(SystemClock.elapsedRealtime());
             chronometer.start();
             chronometerRunning = true;
             
@@ -99,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
     public void stopTimer(View v) {
         if (chronometerRunning) {
             chronometer.stop();
-            stopChronometerOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
             chronometerRunning = false;
             scheduledFuture.cancel(false);
 
@@ -112,10 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void resetTimerAndSendDataToCloud(View v) {
-        chronometer.setBase(SystemClock.elapsedRealtime());
-        stopChronometerOffset = 0;
-
+    public void instructMasterToAnalyzeData(View v) {
+        // TODO: call Master Node
     }
 
     @Override
