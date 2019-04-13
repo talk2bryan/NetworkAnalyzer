@@ -32,4 +32,5 @@ dependencies {
             [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.1']
     )
     compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'fr.bmartel:jspeedtest:1.32.1'
 }

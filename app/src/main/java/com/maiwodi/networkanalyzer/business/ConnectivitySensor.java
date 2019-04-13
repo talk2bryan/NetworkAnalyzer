@@ -25,8 +25,8 @@ public class ConnectivitySensor {
 
     private ArrayList<DataEntry> dataEntries;
     private static final  String BASE_ADDRESS = "http://";
-    private static final String DEFAULT_SERVER_IP = "140.193.200.126";
-    private static final String POST_RESOURCE_PATH = ":8080/networkanalyzer/rest/myresource/post/data";
+    private static final String DEFAULT_SERVER_IP = "140.193.213.170";
+    private static final String POST_RESOURCE_PATH = ":8080/networkanalyzer/rest/master/post/data";
 
 
     public ConnectivitySensor() {
@@ -52,22 +52,27 @@ public class ConnectivitySensor {
     public void recordWifiSignalStrength(final Context context) {
         WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int rssiValue = wifiInfo.getRssi(); // Unit is dBm.
-        int speedInMbpsSpeed = wifiInfo.getLinkSpeed();
+        final int RSSIVALUE = wifiInfo.getRssi(); // Unit is dBm.
+        final int SPEEDINMBPS = wifiInfo.getLinkSpeed();
 
         Long timeStampLong = System.currentTimeMillis() / 1000;
-        String timeStamp = timeStampLong.toString();
-        LOGGER.info(timeStamp + ", " + rssiValue + ", " + speedInMbpsSpeed);
+        final String timeStamp = timeStampLong.toString();
 
-        if (dataEntries == null)
-            dataEntries = new ArrayList<>();
-        dataEntries.add(new DataEntry(timeStamp, rssiValue, speedInMbpsSpeed));
+        new SpeedTestTask(new SpeedTestTask.AsyncResponse() {
+            @Override
+            public void processFinish(double downloadSpeed) {
+                if (dataEntries == null)
+                    dataEntries = new ArrayList<>();
+                dataEntries.add(new DataEntry(timeStamp, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
+            }
+        }).execute();
     }
 
 
     public void sendDataToCloud(String userMasterIP) {
         if (this.dataEntries != null) {
-            LOGGER.info(buildJsonString());
+            final String dataEntriesAsJsonString = buildJsonString();
+//            LOGGER.info(dataEntriesAsJsonString);
 
             String postUrl = String.format(
               "%s%s%s", BASE_ADDRESS,
@@ -75,7 +80,8 @@ public class ConnectivitySensor {
                     POST_RESOURCE_PATH
             );
 
-            new CallAPI().execute(postUrl, buildJsonString());
+            new CallAPI().execute(postUrl, dataEntriesAsJsonString);
+            System.out.println("Generated " + dataEntries.size() + " entries.");
             dataEntries = null;
         }
     }
