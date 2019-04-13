@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         chronometer.setBase(SystemClock.elapsedRealtime());
 
 
-        connectivitySensor = new ConnectivitySensor();
+        connectivitySensor = new ConnectivitySensor(context);
 
 
     }

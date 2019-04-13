@@ -16,7 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.maiwodi.networkanalyzer.objects.DataEntry;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 public class ConnectivitySensor {
@@ -24,13 +28,28 @@ public class ConnectivitySensor {
             Thread.currentThread().getStackTrace()[0].getClassName());
 
     private ArrayList<DataEntry> dataEntries;
-    private static final  String BASE_ADDRESS = "http://";
-    private static final String DEFAULT_SERVER_IP = "140.193.213.170";
-    private static final String POST_RESOURCE_PATH = ":8080/networkanalyzer/rest/master/post/data";
+    private static String BASE_ADDRESS;
+    private static String DEFAULT_SERVER_IP;
+    private static String POST_RESOURCE_PATH;
 
 
-    public ConnectivitySensor() {
+    public ConnectivitySensor(Context context) {
         LOGGER.info("ConnectivitySensor instantiated.");
+
+        try {
+            InputStream is = context.getAssets().open("config.properties");
+            Properties props = new Properties();
+            props.load(is);
+
+            BASE_ADDRESS = props.getProperty("base_address", "");
+            DEFAULT_SERVER_IP = props.getProperty("default_server_ip", "");
+            POST_RESOURCE_PATH = props.getProperty("post_resource_path", "");
+
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         dataEntries = null;
     }
 
