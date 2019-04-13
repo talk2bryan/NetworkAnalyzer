@@ -77,20 +77,26 @@ public class ConnectivitySensor {
         Long timeStampLong = System.currentTimeMillis() / 1000;
         final String timeStamp = timeStampLong.toString();
 
-        new SpeedTestTask(new SpeedTestTask.AsyncResponse() {
-            @Override
-            public void processFinish(double downloadSpeed) {
-                if (dataEntries == null)
-                    dataEntries = new ArrayList<>();
-                dataEntries.add(new DataEntry(timeStamp, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
-            }
-        }).execute();
+        try {
+            new SpeedTestTask(new SpeedTestTask.AsyncResponse() {
+                @Override
+                public void processFinish(double downloadSpeed) {
+                    if (dataEntries == null)
+                        dataEntries = new ArrayList<>();
+                    dataEntries.add(new DataEntry(timeStamp, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
+                }
+            }).execute().get(); // .get() forces the application to wait for this call to complete.
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
     public void sendDataToCloud(String userMasterIP) {
         if (this.dataEntries != null) {
-            final String dataEntriesAsJsonString = buildJsonString();
+            String dataEntriesAsJsonString = buildJsonString();
 //            LOGGER.info(dataEntriesAsJsonString);
 
             String postUrl = String.format(
@@ -98,8 +104,14 @@ public class ConnectivitySensor {
                     (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
                     POST_RESOURCE_PATH
             );
+            try {
+                new CallAPI().execute(postUrl, dataEntriesAsJsonString).get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            new CallAPI().execute(postUrl, dataEntriesAsJsonString);
             System.out.println("Generated " + dataEntries.size() + " entries.");
             dataEntries = null;
         }
