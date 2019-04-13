@@ -2,6 +2,8 @@ package com.maiwodi.networkanalyzer.business;
 
 import android.os.AsyncTask;
 
+import com.maiwodi.networkanalyzer.persistence.AsyncResponse;
+
 import java.math.BigDecimal;
 
 import fr.bmartel.speedtest.SpeedTestReport;
@@ -28,7 +30,7 @@ public class SpeedTestTask extends AsyncTask<Void, Void, Void> {
                 // called when download/upload is finished
                 BigDecimal bitsPerSecond = report.getTransferRateBit();
                 double mbps = bpsToMbps(bitsPerSecond);
-                delegate.processFinish(mbps);
+                delegate.processDownloadSpeed(mbps);
 //                Log.v("speedtest", "[COMPLETED] rate in MB/s   : " + mbps);
             }
 
@@ -55,10 +57,5 @@ public class SpeedTestTask extends AsyncTask<Void, Void, Void> {
         speedTestSocket.startDownload("http://ipv4.ikoula.testdebit.info/1M.iso");
 
         return null;
-    }
-
-
-    public interface AsyncResponse {
-        void processFinish(double output);
     }
 }
