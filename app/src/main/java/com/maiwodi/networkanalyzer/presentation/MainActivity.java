@@ -79,8 +79,9 @@ public class MainActivity extends AppCompatActivity {
             // To avoid memory leak...
             ScheduledThreadPoolExecutor ex = (ScheduledThreadPoolExecutor) executor;
             ex.setRemoveOnCancelPolicy(true);
+            // Generate 1000 data entries per second
             scheduledFuture = executor.scheduleAtFixedRate(
-                    periodicRecording, 0, 2, TimeUnit.SECONDS);
+                    periodicRecording, 0, 1, TimeUnit.MILLISECONDS);
         }
     }
 
