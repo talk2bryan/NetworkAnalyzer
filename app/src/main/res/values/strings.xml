@@ -4,4 +4,6 @@
     <string name="end">end</string>
     <string name="start">start</string>
     <string name="analyze">Analyze</string>
+    <string name="connectedToInternet">Connected to Internet</string>
+    <string name="notConnectedToInternet">Not Connected to Internet</string>
 </resources>

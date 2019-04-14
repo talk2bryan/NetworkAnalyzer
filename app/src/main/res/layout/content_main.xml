@@ -92,4 +92,6 @@
         android:hint="Master IP Address"
         android:inputType="textPersonName"
         />
+
+
 </RelativeLayout>
