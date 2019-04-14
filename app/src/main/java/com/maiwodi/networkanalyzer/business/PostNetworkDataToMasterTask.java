@@ -11,7 +11,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
-public class CallAPI extends AsyncTask<String, Void, String> {
+public class PostNetworkDataToMasterTask extends AsyncTask<String, Void, String> {
 
     private static Logger LOGGER = Logger.getLogger(
             Thread.currentThread().getStackTrace()[0].getClassName());

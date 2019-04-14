@@ -15,41 +15,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.maiwodi.networkanalyzer.objects.DataEntry;
+import com.maiwodi.networkanalyzer.persistence.AsyncResponse;
+import com.maiwodi.networkanalyzer.services.Utilities;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 public class ConnectivitySensor {
-    private static Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             Thread.currentThread().getStackTrace()[0].getClassName());
 
+    private final Utilities RESOURCE_UTILS;
+
     private ArrayList<DataEntry> dataEntries;
-    private static String BASE_ADDRESS;
-    private static String DEFAULT_SERVER_IP;
-    private static String POST_RESOURCE_PATH;
 
 
     public ConnectivitySensor(Context context) {
         LOGGER.info("ConnectivitySensor instantiated.");
 
-        try {
-            InputStream is = context.getAssets().open("config.properties");
-            Properties props = new Properties();
-            props.load(is);
-
-            BASE_ADDRESS = props.getProperty("base_address", "");
-            DEFAULT_SERVER_IP = props.getProperty("default_server_ip", "");
-            POST_RESOURCE_PATH = props.getProperty("post_resource_path", "");
-
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        RESOURCE_UTILS = new Utilities(context, "config.properties");
         dataEntries = null;
     }
 
@@ -78,9 +63,9 @@ public class ConnectivitySensor {
         final String timeStamp = timeStampLong.toString();
 
         try {
-            new SpeedTestTask(new SpeedTestTask.AsyncResponse() {
+            new SpeedTestTask(new AsyncResponse() {
                 @Override
-                public void processFinish(double downloadSpeed) {
+                public void processDownloadSpeed(double downloadSpeed) {
                     if (dataEntries == null)
                         dataEntries = new ArrayList<>();
                     dataEntries.add(new DataEntry(timeStamp, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
@@ -99,13 +84,9 @@ public class ConnectivitySensor {
             String dataEntriesAsJsonString = buildJsonString();
 //            LOGGER.info(dataEntriesAsJsonString);
 
-            String postUrl = String.format(
-              "%s%s%s", BASE_ADDRESS,
-                    (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
-                    POST_RESOURCE_PATH
-            );
+            String postUrl = RESOURCE_UTILS.loadPostResourcePath(userMasterIP);
             try {
-                new CallAPI().execute(postUrl, dataEntriesAsJsonString).get();
+                new PostNetworkDataToMasterTask().execute(postUrl, dataEntriesAsJsonString).get();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -115,6 +96,18 @@ public class ConnectivitySensor {
             System.out.println("Generated " + dataEntries.size() + " entries.");
             dataEntries = null;
         }
+    }
+
+    public String getNetworkDataAnalysis(String userMasterIP) {
+        String getUrl = RESOURCE_UTILS.loadGetResourcePath(userMasterIP);
+        String result = null;
+        try {
+            result = new GetAnalyzedDataFromMasterTask().execute(getUrl).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     private String buildJsonString() {
