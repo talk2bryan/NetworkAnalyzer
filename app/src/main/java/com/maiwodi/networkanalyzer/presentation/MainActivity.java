@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.maiwodi.networkanalyzer.R;
 import com.maiwodi.networkanalyzer.business.ConnectivitySensor;
+import com.maiwodi.networkanalyzer.services.Utilities;
 
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -30,15 +32,15 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    ConnectivitySensor connectivitySensor;
+    private ConnectivitySensor connectivitySensor;
     private Context context;
-    private int currentBattteryPercentage = 0;
     private ProgressBar progressBar;
     private TextView batteryPercentageTextView;
     private TextView wifiConnectionStatusTextView;
     private Chronometer chronometer;
     private boolean chronometerRunning;
     private ScheduledFuture<?> scheduledFuture;
+    private Utilities RESOURCE_UTILS;
 
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             int batteryScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             float batteryPercentage = batteryLevel / (float) batteryScale;
-            currentBattteryPercentage = (int) (batteryPercentage * 100);
+            int currentBattteryPercentage = (int) (batteryPercentage * 100);
             batteryPercentageTextView.setText(String.format(Locale.getDefault(), "%d%%",
                     currentBattteryPercentage));
             progressBar.setProgress(currentBattteryPercentage);
@@ -63,14 +65,11 @@ public class MainActivity extends AppCompatActivity {
             
             setWifiConnectionStatusText();
 
-            Runnable periodicRecording = new Runnable() {
-                @Override
-                public void run() {
-                    if (connectivitySensor.hasInternetConnection(context)) {
-                        connectivitySensor.recordWifiSignalStrength(context);
-                    } else {
-                        Log.d("MainActivity", "startTimer() - Not connected to WiFi");
-                    }
+            Runnable periodicRecording = () -> {
+                if (connectivitySensor.hasInternetConnection(context)) {
+                    connectivitySensor.recordWifiSignalStrength(context);
+                } else {
+                    Log.d("MainActivity", "startTimer() - Not connected to WiFi");
                 }
             };
 
@@ -86,14 +85,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void setWifiConnectionStatusText() {
         if (connectivitySensor.hasInternetConnection(context)) {
-            wifiConnectionStatusTextView.setText("Connected to Internet");
+            wifiConnectionStatusTextView.setText(R.string.connectedToInternet);
             wifiConnectionStatusTextView.setBackgroundColor(0xFF7CCC26); // Green.
         } else {
-            wifiConnectionStatusTextView.setText("Not Connected to Internet");
+            wifiConnectionStatusTextView.setText(R.string.notConnectedToInternet);
             wifiConnectionStatusTextView.setBackgroundColor(0xFFFF0000); // Red.
             Log.d("MainActivity", "startTimer() - Not connected to WiFi");
         }
     }
+
 
     public void stopTimer(View v) {
         if (chronometerRunning) {
@@ -107,11 +107,27 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("MainActivity", "stopTimer()");
         }
-
     }
 
     public void instructMasterToAnalyzeData(View v) {
         // TODO: call Master Node
+        if (!chronometerRunning) {
+            EditText masterIP = findViewById(R.id.ipAddress);
+            String masterIPAddress = String.valueOf(masterIP.getText());
+            String urlRedirect = connectivitySensor.getNetworkDataAnalysis(masterIPAddress);
+
+            Log.d("MainActivity Redirect: ", urlRedirect);
+
+            if (urlRedirect != null) {
+                String analyzedDataLocation = RESOURCE_UTILS.loadAnalyzedDataLocationURL(masterIPAddress);
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(analyzedDataLocation));
+                startActivity(i);
+            } else {
+                // TODO: Pop up message - No data, use AlertDialog
+                Log.d("MainActivity - Analyze:", " There is no data on server to analyze.");
+            }
+        }
     }
 
     @Override
@@ -128,15 +144,12 @@ public class MainActivity extends AppCompatActivity {
         wifiConnectionStatusTextView = findViewById(R.id.wifiIsConnected);
         progressBar = findViewById(R.id.pb);
 
-
         chronometer = findViewById(R.id.chronometer);
         chronometer.setFormat("Time: %s");
         chronometer.setBase(SystemClock.elapsedRealtime());
 
-
+        RESOURCE_UTILS = new Utilities(context, "config.properties");
         connectivitySensor = new ConnectivitySensor(context);
-
-
     }
 
     @Override
