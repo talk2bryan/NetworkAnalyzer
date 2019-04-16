@@ -37,29 +37,26 @@ public class Utilities {
     }
 
     public String loadGetResourcePath(String userMasterIP) {
-        String getUrl = String.format(
+        return String.format(
                 "%s%s%s", BASE_ADDRESS,
                 (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
                 GET_RESOURCE_PATH
         );
-        return getUrl;
     }
 
     public String loadPostResourcePath(String userMasterIP) {
-        String postUrl = String.format(
+        return String.format(
                 "%s%s%s", BASE_ADDRESS,
                 (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
                 POST_RESOURCE_PATH
         );
-        return postUrl;
     }
 
     public String loadAnalyzedDataLocationURL(String userMasterIP) {
-        String postUrl = String.format(
+        return String.format(
                 "%s%s%s", BASE_ADDRESS,
                 (userMasterIP.length() == 0 ? DEFAULT_SERVER_IP : userMasterIP),
-                POST_RESOURCE_PATH
+                DATA_RESOURCE_PATH
         );
-        return postUrl;
     }
 }
