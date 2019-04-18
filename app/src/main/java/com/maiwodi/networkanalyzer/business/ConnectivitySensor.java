@@ -60,7 +60,7 @@ public class ConnectivitySensor {
         final int SPEEDINMBPS = wifiInfo.getLinkSpeed();
 
         Long timeStampLong = System.currentTimeMillis() / 1000;
-        final String timeStamp = timeStampLong.toString();
+        final String TIMESTAMP = timeStampLong.toString();
 
         try {
             new SpeedTestTask(new AsyncResponse() {
@@ -68,7 +68,7 @@ public class ConnectivitySensor {
                 public void processDownloadSpeed(double downloadSpeed) {
                     if (dataEntries == null)
                         dataEntries = new ArrayList<>();
-                    dataEntries.add(new DataEntry(timeStamp, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
+                    dataEntries.add(new DataEntry(TIMESTAMP, RSSIVALUE, SPEEDINMBPS, downloadSpeed));
                 }
             }).execute().get(); // .get() forces the application to wait for this call to complete.
         } catch (ExecutionException e) {

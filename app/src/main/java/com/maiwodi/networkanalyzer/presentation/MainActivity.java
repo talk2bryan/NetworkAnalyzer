@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
             String masterIPAddress = String.valueOf(masterIP.getText());
             String urlRedirect = connectivitySensor.getNetworkDataAnalysis(masterIPAddress);
 
-            Log.d("MainActivity Redirect: ", urlRedirect);
-
             if (urlRedirect != null) {
+                Log.d("MainActivity Redirect: ", urlRedirect);
+
                 String analyzedDataLocation = RESOURCE_UTILS.loadAnalyzedDataLocationURL(masterIPAddress);
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(analyzedDataLocation));
